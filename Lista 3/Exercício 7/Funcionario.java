@@ -7,7 +7,7 @@ public class Funcionario {
         this.salary= salary;
     }
 
-    public String getNome() {
+    public String getName() {
         return name;
     }
 
