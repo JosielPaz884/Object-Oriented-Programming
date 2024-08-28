@@ -23,4 +23,21 @@ public class Pedido{
   public List<ItemPedido> getItem(){
     return item;
   }
+
+  public void addItem(ItemPedido items){
+    item.add(items);
+  }
+
+  public void removeItem(ItemPedido items){
+    item.remove(items);
+  }
+
+  public double sum(){
+    double sum=0;
+    for(ItemPedidos items: item){
+      sum+=items.getQuantity(); 
+    }
+    total=sum*10;
+    return total;
+  }
 }
