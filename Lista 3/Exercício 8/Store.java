@@ -27,11 +27,18 @@ public class Store{
           Systemo.out.println("Item adicionado com sucesso");
 
         case 2:
-          System.out.println("Digite nome do produto:");
-          String name= scanner.nextLine();
-          for(int x=0;x<order.size();x++){
-            
-          }
+          System.out.println("Digite o número do índice do produto que deseja retirar:");
+          int indexFalse= scanner.nextInt();
+          int index=indexFalse-1;
+          order.removeItem(order.getItem().get(index));
+
+        case 3:
+          double total= order.sum();
+          System.out.println("Pedido Concluído!\nTotal do pedido:"+total);
+          scanner.close();
+
+        default:
+          System.out,println("Opção inválida!")
       }
     }
   }
