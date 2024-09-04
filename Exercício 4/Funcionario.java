@@ -30,7 +30,7 @@ public class Funcionario {
     }
 
     public double getAmountOvertime() {
-        return AmountOvertime;
+        return amountOvertime;
     }
 
     public void setAmountOvertime(double amountOvertime) {
