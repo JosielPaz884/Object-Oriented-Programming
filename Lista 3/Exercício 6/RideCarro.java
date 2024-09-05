@@ -5,7 +5,7 @@ public class RideCarro{
         myCar.printInformation();
         myCar.setMileage(10000); 
         System.out.println("\nInformações do carro após alterar a quilometragem total:");
-        myCar.imprimirInformacoes();
+        myCar.printInformation();
         myCar.setMileageTraveled(500, true); 
         System.out.println("\nInformações do carro após somar quilometragem de viagem:");
         myCar.printInformation());
