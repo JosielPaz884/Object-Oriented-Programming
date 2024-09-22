@@ -1,0 +1,2432 @@
+Exercício 1:
+Código com IA:
+import java.util.Objects;
+
+public class Livro {
+    private String titulo;
+    private String autor;
+    private String isbn;
+    private boolean disponivel;
+
+    public Livro(String titulo, String autor, String isbn) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.isbn = isbn;
+        this.disponivel = true;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
+    }
+
+    @Override
+    public String toString() {
+        return "Livro{" +
+                "titulo='" + titulo + '\'' +
+                ", autor='" + autor + '\'' +
+                ", isbn='" + isbn + '\'' +
+                ", disponivel=" + disponivel +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Livro livro = (Livro) o;
+        return Objects.equals(isbn, livro.isbn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbn);
+    }
+}
+
+public class Usuario {
+    private String nome;
+    private int id;
+
+    public Usuario(String nome, int id) {
+        this.nome = nome;
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "nome='" + nome + '\'' +
+                ", id=" + id +
+                '}';
+    }
+}
+
+import java.time.LocalDate;
+
+public class Emprestimo {
+    private Livro livro;
+    private Usuario usuario;
+    private LocalDate dataEmprestimo;
+    private LocalDate dataDevolucao;
+
+    public Emprestimo(Livro livro, Usuario usuario, LocalDate dataEmprestimo, LocalDate dataDevolucao) {
+        this.livro = livro;
+        this.usuario = usuario;
+        this.dataEmprestimo = dataEmprestimo;
+        this.dataDevolucao = dataDevolucao;
+    }
+
+    public Livro getLivro() {
+        return livro;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public LocalDate getDataEmprestimo() {
+        return dataEmprestimo;
+    }
+
+    public LocalDate getDataDevolucao() {
+        return dataDevolucao;
+    }
+
+    public boolean isAtrasado() {
+        return LocalDate.now().isAfter(dataDevolucao);
+    }
+
+    @Override
+    public String toString() {
+        return "Emprestimo{" +
+                "livro=" + livro +
+                ", usuario=" + usuario +
+                ", dataEmprestimo=" + dataEmprestimo +
+                ", dataDevolucao=" + dataDevolucao +
+                '}';
+    }
+}
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Biblioteca {
+    private List<Livro> livros;
+    private List<Emprestimo> emprestimos;
+
+    public Biblioteca() {
+        this.livros = new ArrayList<>();
+        this.emprestimos = new ArrayList<>();
+    }
+
+    // Adiciona um novo livro à biblioteca
+    public void adicionarLivro(Livro livro) {
+        livros.add(livro);
+    }
+
+    // Registra um novo empréstimo
+    public void registrarEmprestimo(Livro livro, Usuario usuario, LocalDate dataDevolucao) {
+        if (livro.isDisponivel()) {
+            livro.setDisponivel(false);
+            Emprestimo emprestimo = new Emprestimo(livro, usuario, LocalDate.now(), dataDevolucao);
+            emprestimos.add(emprestimo);
+            System.out.println("Empréstimo registrado com sucesso: " + emprestimo);
+        } else {
+            System.out.println("Livro indisponível: " + livro.getTitulo());
+        }
+    }
+
+    // Lista todos os livros disponíveis
+    public void listarLivrosDisponiveis() {
+        System.out.println("Livros disponíveis:");
+        for (Livro livro : livros) {
+            if (livro.isDisponivel()) {
+                System.out.println(livro);
+            }
+        }
+    }
+
+    // Lista todos os livros emprestados
+    public void listarLivrosEmprestados() {
+        System.out.println("Livros emprestados:");
+        for (Emprestimo emprestimo : emprestimos) {
+            System.out.println(emprestimo);
+        }
+    }
+
+    // Calcula a multa para devoluções atrasadas (considerando multa diária)
+    public double calcularMulta(Emprestimo emprestimo, double valorPorDia) {
+        if (emprestimo.isAtrasado()) {
+            long diasAtraso = ChronoUnit.DAYS.between(emprestimo.getDataDevolucao(), LocalDate.now());
+            return diasAtraso * valorPorDia;
+        }
+        return 0.0;
+    }
+
+    // Lista todas as devoluções atrasadas e calcula a multa total
+    public void listarDevolucoesAtrasadas(double valorPorDia) {
+        System.out.println("Devoluções atrasadas e multas:");
+        for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.isAtrasado()) {
+                double multa = calcularMulta(emprestimo, valorPorDia);
+                System.out.println("Empréstimo atrasado: " + emprestimo + " | Multa: R$" + multa);
+            }
+        }
+    }
+}
+
+  import java.time.LocalDate;
+  
+  public class Main {
+      public static void main(String[] args) {
+          Biblioteca biblioteca = new Biblioteca();
+  
+          // Criação de livros
+          Livro livro1 = new Livro("Java para Iniciantes", "John Doe", "12345");
+          Livro livro2 = new Livro("Estruturas de Dados em Java", "Jane Doe", "67890");
+  
+          // Adicionando livros à biblioteca
+          biblioteca.adicionarLivro(livro1);
+          biblioteca.adicionarLivro(livro2);
+  
+          // Criação de usuários
+          Usuario usuario1 = new Usuario("Carlos Silva", 1);
+          Usuario usuario2 = new Usuario("Maria Oliveira", 2);
+  
+          // Registrando empréstimos
+          biblioteca.registrarEmprestimo(livro1, usuario1, LocalDate.now().plusDays(7)); // Devolução em 7 dias
+          biblioteca.registrarEmprestimo(livro2, usuario2, LocalDate.now().plusDays(5)); // Devolução em 5 dias
+  
+          // Listando livros disponíveis
+          biblioteca.listarLivrosDisponiveis();
+  
+          // Listando livros emprestados
+          biblioteca.listarLivrosEmprestados();
+  
+          // Simulação de devolução atrasada (considerando que já passou da data de devolução)
+          biblioteca.listarDevolucoesAtrasadas(2.5); // Multa diária de R$ 2,50
+      }
+  }
+
+Código sem IA:
+
+public class Usuario {
+    private String name;
+    private int id;
+
+    public Usuario(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+}
+
+public class Livro {
+    private String title;
+    private String author;
+    private int isbn;
+
+    public Livro(String title, String author, int isbn) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public int getIsbn() {
+        return isbn;
+    }
+}
+
+import java.time.LocalDate;
+
+public class Emprestimo {
+    private Livro book;
+    private Usuario user;
+    private LocalDate dateLoan;
+    private LocalDate dateReturn;
+
+    public Emprestimo(Livro book, Usuario user, LocalDate dataloan, LocalDate dateReturn) {
+        this.book = book;
+        this.user = user;
+        this.dateLoan = dataloan;
+        this.dateReturn = dateReturn;
+    }
+
+    public Livro getBook() {
+        return book;
+    }
+
+    public Usuario getUser() {
+        return user;
+    }
+
+    public LocalDate getDateLoan() {
+        return dateLoan;
+    }
+
+    public LocalDate getDateReturn() {
+        return dateReturn;
+    }
+}
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Biblioteca {
+    private List<Livro> books;
+    private List<Emprestimo> loan;
+
+    public Biblioteca() {
+        this.books = new ArrayList<>();
+        this.loan = new ArrayList<>();
+    }
+
+    public void addLivro(Livro book) {
+        books.add(book);
+    }
+
+    public void registerLoan(Livro book, Usuario usuario, LocalDate dateLoan, LocalDate dateReturn) {
+        Emprestimo loans = new Emprestimo(book, usuario, dateLoan, dateReturn);
+        loan.add(loans);
+        books.remove(book);
+    }
+
+    public List<Livro> getBookFree() {
+        return books;
+    }
+
+    public List<Emprestimo> getBookLoan() {
+        return loan;
+    }
+
+    public double calcuteBill(Emprestimo loan) {
+        LocalDate dateReturnRecent = LocalDate.now();
+        long dayLate = java.time.temporal.ChronoUnit.DAYS.between(loan.getDateReturn(), dateReturnRecent);
+        if (dayLate > 0) {
+            return dayLate * 0.5;
+        } else {
+            return 0;
+        }
+    }
+}
+
+import java.time.LocalDate;
+import java.util.Scanner;
+
+public class Sistema {
+    public static void main(String[] args) {
+        Biblioteca library = new Biblioteca();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu de sistema de biblioteca:");
+            System.out.println("1. Adicionar livro:");
+            System.out.println("2. Registrar empréstimo:");
+            System.out.println("3. Listar livros emprestados:");
+            System.out.println("4. Listar livros disponíveis:");
+            System.out.println("5. Calcular Multa:");
+            System.out.println("6. Sair");
+
+            System.out.println("Digite sua opção:");
+            int option = scanner.nextInt();
+
+            switch (option) {
+                case 1:
+                    addBook(library, scanner);
+                    break;
+
+                case 2:
+                    register(library, scanner);
+                    break;
+
+                case 3:
+                    listBooksLoan(library);
+                    break;
+
+                case 4:
+                    listBooksFree(library);
+                    break;
+
+                case 5:
+                    calcute(library, scanner);
+                    break;
+
+                case 6:
+                    System.out.println("Saindo do sistema...");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Opção inválida. Tente Novamente");
+            }
+        }
+    }
+
+    private static void addBook(Biblioteca library, Scanner scanner) {
+        System.out.println("Digite o nome do livro:");
+        String title = scanner.next();
+        System.out.println("Digite o autor do livro:");
+        String author = scanner.next();
+        System.out.println("Digite o ISBN do livro:");
+        int isbn = scanner.nextInt();
+
+        Livro book = new Livro(title, author, isbn);
+        library.addLivro(book);
+        System.out.println("Livro adicionado com sucesso!");
+    }
+
+    private static void register(Biblioteca library, Scanner scanner) {
+        System.out.println("Título do livro:");
+        String title = scanner.next();
+        System.out.println("Nome do usuário:");
+        String name = scanner.next();
+        System.out.println("ID do usuário:");
+        int id = scanner.nextInt();
+        Livro book = findBook(library, title);
+        if (book != null) {
+            Usuario user = new Usuario(name, id);
+            LocalDate dateLoan = LocalDate.now();
+            LocalDate dateReturn = dateLoan.plusDays(14);
+            library.registerLoan(book, user, dateLoan, dateReturn);
+            System.out.println("Empréstimo registrado com sucesso!");
+        } else {
+            System.out.println("Livro não encontrado");
+        }
+    }
+
+    private static void listBooksLoan(Biblioteca library) {
+        System.out.println("Livros emprestados:");
+        for (Emprestimo loan : library.getBookLoan()) {
+            System.out.println(loan.getBook().getTitle() + " - " + loan.getUser().getName());
+        }
+    }
+
+    private static void listBooksFree(Biblioteca library) {
+        System.out.println("Livros disponíveis:");
+        for (Livro book : library.getBookFree()) {
+            System.out.println(book.getTitle());
+        }
+    }
+
+    private static void calcute(Biblioteca library, Scanner scanner) {
+        System.out.println("Digite o título do livro:");
+        String title = scanner.next();
+        Emprestimo loan = findLoan(library, title);
+        if (loan != null) {
+            double bill = library.calcuteBill(loan);
+            System.out.println("Multa para " + loan.getBook().getTitle() + ": R$ " + bill);
+        } else {
+            System.out.println("Empréstimo não encontrado.");
+        }
+    }
+
+    private static Livro findBook(Biblioteca library, String title) {
+        for (Livro book : library.getBookFree()) {
+            if (book.getTitle().equals(title)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
+    private static Emprestimo findLoan(Biblioteca library, String title) {
+        for (Emprestimo loan : library.getBookLoan()) {
+            if (loan.getBook().getTitle().equals(title)) {
+                return loan;
+            }
+        }
+        return null;
+    }
+}
+
+Exercício 2:
+Código com IA:
+
+public class Veiculo {
+    private String modelo;
+    private String placa;
+    private int capacidade;
+
+    public Veiculo(String modelo, String placa, int capacidade) {
+        this.modelo = modelo;
+        this.placa = placa;
+        this.capacidade = capacidade;
+    }
+
+    public String getModelo() {
+        return modelo;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public int getCapacidade() {
+        return capacidade;
+    }
+
+    @Override
+    public String toString() {
+        return "Veiculo{" +
+                "modelo='" + modelo + '\'' +
+                ", placa='" + placa + '\'' +
+                ", capacidade=" + capacidade +
+                '}';
+    }
+}
+
+public class Motorista {
+    private String nome;
+    private String cnh;
+
+    public Motorista(String nome, String cnh) {
+        this.nome = nome;
+        this.cnh = cnh;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCnh() {
+        return cnh;
+    }
+
+    @Override
+    public String toString() {
+        return "Motorista{" +
+                "nome='" + nome + '\'' +
+                ", cnh='" + cnh + '\'' +
+                '}';
+    }
+}
+
+public class Viagem {
+    private Veiculo veiculo;
+    private Motorista motorista;
+    private String origem;
+    private String destino;
+    private double distancia; // em quilômetros
+
+    public Viagem(Veiculo veiculo, Motorista motorista, String origem, String destino, double distancia) {
+        this.veiculo = veiculo;
+        this.motorista = motorista;
+        this.origem = origem;
+        this.destino = destino;
+        this.distancia = distancia;
+    }
+
+    public Veiculo getVeiculo() {
+        return veiculo;
+    }
+
+    public Motorista getMotorista() {
+        return motorista;
+    }
+
+    public String getOrigem() {
+        return origem;
+    }
+
+    public String getDestino() {
+        return destino;
+    }
+
+    public double getDistancia() {
+        return distancia;
+    }
+
+    @Override
+    public String toString() {
+        return "Viagem{" +
+                "veiculo=" + veiculo +
+                ", motorista=" + motorista +
+                ", origem='" + origem + '\'' +
+                ", destino='" + destino + '\'' +
+                ", distancia=" + distancia +
+                '}';
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Frota {
+    private List<Veiculo> veiculos;
+    private List<Viagem> viagens;
+
+    public Frota() {
+        this.veiculos = new ArrayList<>();
+        this.viagens = new ArrayList<>();
+    }
+
+    // Adiciona um novo veículo à frota
+    public void adicionarVeiculo(Veiculo veiculo) {
+        veiculos.add(veiculo);
+        System.out.println("Veículo adicionado: " + veiculo);
+    }
+
+    // Registra uma nova viagem
+    public void registrarViagem(Veiculo veiculo, Motorista motorista, String origem, String destino, double distancia) {
+        if (veiculos.contains(veiculo)) {
+            Viagem viagem = new Viagem(veiculo, motorista, origem, destino, distancia);
+            viagens.add(viagem);
+            System.out.println("Viagem registrada: " + viagem);
+        } else {
+            System.out.println("Veículo não encontrado na frota.");
+        }
+    }
+
+    // Lista todas as viagens de um veículo específico
+    public void listarViagensPorVeiculo(Veiculo veiculo) {
+        System.out.println("Viagens realizadas pelo veículo com placa " + veiculo.getPlaca() + ":");
+        for (Viagem viagem : viagens) {
+            if (viagem.getVeiculo().equals(veiculo)) {
+                System.out.println(viagem);
+            }
+        }
+    }
+
+    // Calcula a quilometragem total percorrida pela frota
+    public double calcularQuilometragemTotal() {
+        double totalDistancia = 0;
+        for (Viagem viagem : viagens) {
+            totalDistancia += viagem.getDistancia();
+        }
+        return totalDistancia;
+    }
+
+    // Lista todos os veículos da frota
+    public void listarVeiculos() {
+        System.out.println("Veículos da frota:");
+        for (Veiculo veiculo : veiculos) {
+            System.out.println(veiculo);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Criando a frota
+        Frota frota = new Frota();
+
+        // Criando veículos
+        Veiculo veiculo1 = new Veiculo("Caminhão", "ABC1234", 5000);
+        Veiculo veiculo2 = new Veiculo("Van", "XYZ5678", 1500);
+
+        // Adicionando veículos à frota
+        frota.adicionarVeiculo(veiculo1);
+        frota.adicionarVeiculo(veiculo2);
+
+        // Criando motoristas
+        Motorista motorista1 = new Motorista("João Silva", "CNH123456");
+        Motorista motorista2 = new Motorista("Ana Pereira", "CNH654321");
+
+        // Registrando viagens
+        frota.registrarViagem(veiculo1, motorista1, "São Paulo", "Rio de Janeiro", 430.5);
+        frota.registrarViagem(veiculo2, motorista2, "Belo Horizonte", "Salvador", 1400);
+
+        // Listando veículos
+        frota.listarVeiculos();
+
+        // Listando viagens por veículo
+        frota.listarViagensPorVeiculo(veiculo1);
+
+        // Calculando a quilometragem total da frota
+        double quilometragemTotal = frota.calcularQuilometragemTotal();
+        System.out.println("Quilometragem total percorrida pela frota: " + quilometragemTotal + " km");
+    }
+}
+
+Código sem IA:
+
+public class Veiculo {
+    private String model;
+    private String plate;
+    private int capacity;
+
+    public Veiculo(String model, String plate, int capacity) {
+        this.model = model;
+        this.plate = plate;
+        this.capacity = capacity;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public String getPlate() {
+        return plate;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+}
+
+public class Motorista {
+    private String name;
+    private String cnh;
+
+    public Motorista(String name, String cnh) {
+        this.name = name;
+        this.cnh = cnh;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCnh() {
+        return cnh;
+    }
+}
+
+public class Viagem {
+    private Veiculo vehicle;
+    private Motorista driver;
+    private String origin;
+    private String destination;
+    private double distance;
+
+    public Viagem(Veiculo vehicle, Motorista driver, String origin, String destination, double distance) {
+        this.vehicle = vehicle;
+        this.driver = driver;
+        this.origin = origin;
+        this.destination = destination;
+        this.distance = distance;
+    }
+
+    public Veiculo getVehicle() {
+        return vehicle;
+    }
+
+    public Motorista getDriver() {
+        return driver;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Frota {
+    private List<Veiculo> vehicles;
+    private List<Viagem> trips;
+
+    public Frota() {
+        this.vehicles = new ArrayList<>();
+        this.trips = new ArrayList<>();
+    }
+
+    public void addVehicle(Veiculo vehicle) {
+        vehicles.add(vehicle);
+    }
+
+    public void registerTravel(Viagem trip) {
+        trips.add(trip);
+    }
+
+    public List<Viagem> listTripsByVehicle(Veiculo vehicle) {
+        List<Viagem> VehicleTravels = new ArrayList<>();
+        for (Viagem trip : trips) {
+            if (trip.getVehicle().equals(vehicle)) {
+                VehicleTravels.add(trip);
+            }
+        }
+        return VehicleTravels;
+    }
+
+    public double calculateTotalMileage() {
+        double totalMileage = 0;
+        for (Viagem trip : trips) {
+            totalMileage += trip.getDistance();
+        }
+        return totalMileage;
+    }
+
+    public Veiculo[] getVehicle() {
+        return vehicles.toArray(new Veiculo[vehicles.size()]);
+    }
+}
+
+import java.util.List;
+import java.util.Scanner;
+
+public class Manage {
+    public static void main(String[] args) {
+        Frota frota = new Frota();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Adicionar veículo");
+            System.out.println("2. Registrar viagem");
+            System.out.println("3. Listar viagens por veículo");
+            System.out.println("4. Calcular quilometragem total");
+            System.out.println("5. Sair");
+            System.out.print("Opção: ");
+            int opcao = scanner.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    addVehicle(frota, scanner);
+                    break;
+                case 2:
+                    registerTravel(frota, scanner);
+                    break;
+                case 3:
+                    listTripsByVehicle(frota, scanner);
+                    break;
+                case 4:
+                    calculateTotalMileage(frota);
+                    break;
+                case 5:
+                    System.out.println("Saindo...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+    }
+
+    private static void addVehicle(Frota frota, Scanner scanner) {
+        System.out.print("Modelo do veículo: ");
+        String model = scanner.next();
+        System.out.print("Placa do veículo: ");
+        String plate = scanner.next();
+        System.out.print("Capacidade do veículo: ");
+        int capacity = scanner.nextInt();
+
+        Veiculo vehicle = new Veiculo(model, plate, capacity);
+        frota.addVehicle(vehicle);
+        System.out.println("Veículo adicionado com sucesso!");
+    }
+
+    private static void registerTravel(Frota frota, Scanner scanner) {
+        System.out.print("Placa do veículo: ");
+        String plate = scanner.next();
+        Veiculo vehicle = findVehicle(frota, plate);
+        if (vehicle == null) {
+            System.out.println("Veículo não encontrado.");
+            return;
+        }
+
+        System.out.print("Nome do motorista: ");
+        String nameDriver = scanner.next();
+        System.out.print("CNH do motorista: ");
+        String cnhDriver = scanner.next();
+        Motorista motorista = new Motorista(nameDriver, cnhDriver);
+
+        System.out.print("Origem da viagem: ");
+        String origin = scanner.next();
+        System.out.print("Destino da viagem: ");
+        String destination = scanner.next();
+        System.out.print("Distância da viagem (km): ");
+        double distance = scanner.nextDouble();
+
+        Viagem viagem = new Viagem(vehicle, motorista, origin, destination, distance);
+        frota.registerTravel(viagem);
+        System.out.println("Viagem registrada com sucesso!");
+    }
+
+    private static void listTripsByVehicle(Frota frota, Scanner scanner) {
+        System.out.print("Placa do veículo: ");
+        String placa = scanner.next();
+        Veiculo veiculo = findVehicle(frota, placa);
+        if (veiculo == null) {
+            System.out.println("Veículo não encontrado.");
+            return;
+        }
+
+        List<Viagem> viagens = frota.listTripsByVehicle(veiculo);
+        if (viagens == null || viagens.isEmpty()) {
+            System.out.println("Nenhuma viagem encontrada para esse veículo.");
+        } else {
+            for (Viagem viagem : viagens) {
+                System.out.println("Origem: " + viagem.getOrigin() + ", Destino: " + viagem.getDestination());
+            }
+        }
+    }
+
+    private static Veiculo findVehicle(Frota frota, String plate) {
+        if (plate == null) {
+            return null;
+        }
+        for (Veiculo veiculo : frota.getVehicle()) {
+            if (veiculo != null && veiculo.getPlate() != null && veiculo.getPlate().equals(plate)) {
+                return veiculo;
+            }
+        }
+        return null;
+    }
+
+    private static void calculateTotalMileage(Frota frota) {
+        if (frota != null) {
+            double totalMileage = frota.calculateTotalMileage();
+            System.out.println("Quilometragem total: " + totalMileage + " km");
+        } else {
+            System.out.println("Frota não encontrada.");
+        }
+    }
+}
+
+Exercício 3:
+Código com IA:
+
+public class Tarefa {
+    private String nome;
+    private String descricao;
+    private int duracaoEstimada; // duração em horas
+    private String estado; // novo, em andamento, concluído
+
+    public Tarefa(String nome, String descricao, int duracaoEstimada) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.duracaoEstimada = duracaoEstimada;
+        this.estado = "novo"; // estado inicial é "novo"
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public int getDuracaoEstimada() {
+        return duracaoEstimada;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    @Override
+    public String toString() {
+        return "Tarefa{" +
+                "nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", duracaoEstimada=" + duracaoEstimada +
+                ", estado='" + estado + '\'' +
+                '}';
+    }
+}
+
+public class Funcionario {
+    private String nome;
+    private String cargo;
+
+    public Funcionario(String nome, String cargo) {
+        this.nome = nome;
+        this.cargo = cargo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCargo() {
+        return cargo;
+    }
+
+    @Override
+    public String toString() {
+        return "Funcionario{" +
+                "nome='" + nome + '\'' +
+                ", cargo='" + cargo + '\'' +
+                '}';
+    }
+}
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Projeto {
+    private String nome;
+    private LocalDate dataInicio;
+    private List<Tarefa> tarefas;
+    private List<Funcionario> funcionarios;
+
+    public Projeto(String nome, LocalDate dataInicio) {
+        this.nome = nome;
+        this.dataInicio = dataInicio;
+        this.tarefas = new ArrayList<>();
+        this.funcionarios = new ArrayList<>();
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public LocalDate getDataInicio() {
+        return dataInicio;
+    }
+
+    public List<Tarefa> getTarefas() {
+        return tarefas;
+    }
+
+    public List<Funcionario> getFuncionarios() {
+        return funcionarios;
+    }
+
+    // Adiciona uma tarefa ao projeto
+    public void adicionarTarefa(Tarefa tarefa) {
+        tarefas.add(tarefa);
+    }
+
+    // Aloca um funcionário ao projeto
+    public void alocarFuncionario(Funcionario funcionario) {
+        funcionarios.add(funcionario);
+    }
+
+    // Relatório de progresso do projeto
+    public void gerarRelatorioProgresso() {
+        System.out.println("Progresso do Projeto: " + nome);
+        for (Tarefa tarefa : tarefas) {
+            System.out.println(tarefa);
+        }
+    }
+
+    // Relatório de alocação de funcionários
+    public void gerarRelatorioAlocacao() {
+        System.out.println("Funcionários alocados no Projeto: " + nome);
+        for (Funcionario funcionario : funcionarios) {
+            System.out.println(funcionario);
+        }
+    }
+}
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Empresa {
+    private List<Projeto> projetos;
+
+    public Empresa() {
+        this.projetos = new ArrayList<>();
+    }
+
+    // Cria um novo projeto
+    public void criarProjeto(String nomeProjeto, LocalDate dataInicio) {
+        Projeto projeto = new Projeto(nomeProjeto, dataInicio);
+        projetos.add(projeto);
+        System.out.println("Projeto criado: " + projeto.getNome() + " | Data de início: " + dataInicio);
+    }
+
+    // Aloca um funcionário a um projeto específico
+    public void alocarFuncionarioAProjeto(String nomeProjeto, Funcionario funcionario) {
+        Projeto projeto = encontrarProjetoPorNome(nomeProjeto);
+        if (projeto != null) {
+            projeto.alocarFuncionario(funcionario);
+            System.out.println("Funcionário " + funcionario.getNome() + " alocado ao projeto " + nomeProjeto);
+        } else {
+            System.out.println("Projeto não encontrado.");
+        }
+    }
+
+    // Adiciona uma tarefa a um projeto específico
+    public void adicionarTarefaAProjeto(String nomeProjeto, Tarefa tarefa) {
+        Projeto projeto = encontrarProjetoPorNome(nomeProjeto);
+        if (projeto != null) {
+            projeto.adicionarTarefa(tarefa);
+            System.out.println("Tarefa " + tarefa.getNome() + " adicionada ao projeto " + nomeProjeto);
+        } else {
+            System.out.println("Projeto não encontrado.");
+        }
+    }
+
+    // Encontra um projeto pelo nome
+    private Projeto encontrarProjetoPorNome(String nomeProjeto) {
+        for (Projeto projeto : projetos) {
+            if (projeto.getNome().equalsIgnoreCase(nomeProjeto)) {
+                return projeto;
+            }
+        }
+        return null;
+    }
+
+    // Gera relatório de progresso para todos os projetos
+    public void gerarRelatorioProgressoProjetos() {
+        for (Projeto projeto : projetos) {
+            projeto.gerarRelatorioProgresso();
+        }
+    }
+
+    // Gera relatório de alocação de funcionários para todos os projetos
+    public void gerarRelatorioAlocacaoProjetos() {
+        for (Projeto projeto : projetos) {
+            projeto.gerarRelatorioAlocacao();
+        }
+    }
+}
+
+import java.time.LocalDate;
+
+public class Main {
+    public static void main(String[] args) {
+        Empresa empresa = new Empresa();
+
+        // Criando funcionários
+        Funcionario f1 = new Funcionario("João", "Desenvolvedor");
+        Funcionario f2 = new Funcionario("Maria", "Gerente de Projetos");
+
+        // Criando um projeto
+        empresa.criarProjeto("Sistema de Gestão", LocalDate.now());
+
+        // Alocando funcionários ao projeto
+        empresa.alocarFuncionarioAProjeto("Sistema de Gestão", f1);
+        empresa.alocarFuncionarioAProjeto("Sistema de Gestão", f2);
+
+        // Adicionando tarefas ao projeto
+        Tarefa t1 = new Tarefa("Implementar Login", "Desenvolver a funcionalidade de login", 10);
+        Tarefa t2 = new Tarefa("Criar Banco de Dados", "Estruturar o banco de dados para o sistema", 15);
+        
+        empresa.adicionarTarefaAProjeto("Sistema de Gestão", t1);
+        empresa.adicionarTarefaAProjeto("Sistema de Gestão", t2);
+
+        // Gerando relatórios
+        empresa.gerarRelatorioProgressoProjetos();
+        empresa.gerarRelatorioAlocacaoProjetos();
+    }
+}
+
+Código sem Ia:
+
+public class Tarefa {
+    private String nome;
+    private String descricao;
+    private int duracaoEstimada;
+    private String estado;
+
+    public Tarefa(String nome, String descricao, int duracaoEstimada, String estado) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.duracaoEstimada = duracaoEstimada;
+        this.estado = estado;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public int getDuracaoEstimada() {
+        return duracaoEstimada;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+}
+
+public class Funcionario {
+    private String nome;
+    private String cargo;
+
+    public Funcionario(String nome, String cargo) {
+        this.nome = nome;
+        this.cargo = cargo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCargo() {
+        return cargo;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Projeto {
+    private String nome;
+    private Date dataInicio;
+    private List<Tarefa> tarefas;
+    private List<Funcionario> funcionarios;
+
+    public Projeto(String nome, Date dataInicio) {
+        this.nome = nome;
+        this.dataInicio = dataInicio;
+        this.tarefas = new ArrayList<>();
+        this.funcionarios = new ArrayList<>();
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public Date getDataInicio() {
+        return dataInicio;
+    }
+
+    public List<Tarefa> getTarefas() {
+        return tarefas;
+    }
+
+    public List<Funcionario> getFuncionarios() {
+        return funcionarios;
+    }
+
+    public void addTarefa(Tarefa tarefa) {
+        tarefas.add(tarefa);
+    }
+
+    public void addFuncionario(Funcionario funcionario) {
+        funcionarios.add(funcionario);
+    }
+
+    public Tarefa getTarefaByName(String nomeTarefa) {
+        for (Tarefa tarefa : tarefas) {
+            if (tarefa.getNome().equals(nomeTarefa)) {
+                return tarefa;
+            }
+        }
+        return null;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Empresa {
+    private List<Projeto> projetos;
+
+    public Empresa() {
+        this.projetos = new ArrayList<>();
+    }
+
+    public void criarNovoProjeto(String nome, Date dataInicio) {
+        Projeto projeto = new Projeto(nome, dataInicio);
+        projetos.add(projeto);
+    }
+
+    public void alocarFuncionarioAProjeto(String nomeProjeto, Funcionario funcionario) {
+        for (Projeto projeto : projetos) {
+            if (projeto.getNome().equals(nomeProjeto)) {
+                projeto.addFuncionario(funcionario);
+                return;
+            }
+        }
+    }
+
+    public void adicionarTarefaAProjeto(String nomeProjeto, Tarefa tarefa) {
+        for (Projeto projeto : projetos) {
+            if (projeto.getNome().equals(nomeProjeto)) {
+                projeto.addTarefa(tarefa);
+                return;
+            }
+        }
+    }
+
+    public void gerarRelatorioDeProgresso() {
+        for (Projeto projeto : projetos) {
+            System.out.println("Projeto: " + projeto.getNome());
+            System.out.println("Data de início: " + projeto.getDataInicio());
+            System.out.println("Tarefas:");
+            for (Tarefa tarefa : projeto.getTarefas()) {
+                System.out.println("  " + tarefa.getNome() + " - " + tarefa.getEstado());
+            }
+            System.out.println("Funcionários:");
+            for (Funcionario funcionario : projeto.getFuncionarios()) {
+                System.out.println("  " + funcionario.getNome() + " - " + funcionario.getCargo());
+            }
+            System.out.println();
+        }
+    }
+
+    public void alterarEstadoTarefa(String nomeProjeto, String nomeTarefa, String novoEstado) {
+        Projeto projeto = getProjetoByName(nomeProjeto);
+        if (projeto != null) {
+            Tarefa tarefa = projeto.getTarefaByName(nomeTarefa);
+            if (tarefa != null) {
+                tarefa.setEstado(novoEstado);
+                System.out.println("Estado da tarefa alterado com sucesso!");
+            } else {
+                System.out.println("Tarefa não encontrada.");
+            }
+        } else {
+            System.out.println("Projeto não encontrado.");
+        }
+    }
+
+    private Projeto getProjetoByName(String nomeProjeto) {
+        for (Projeto projeto : projetos) {
+            if (projeto.getNome().equals(nomeProjeto)) {
+                return projeto;
+            }
+        }
+        return null;
+    }
+}
+
+import java.util.Date;
+import java.util.Scanner;
+
+public class Manage {
+    public static void main(String[] args) {
+        Empresa empresa = new Empresa();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Criar novo projeto");
+            System.out.println("2. Alocar funcionário a projeto");
+            System.out.println("3. Adicionar tarefa a projeto");
+            System.out.println("4. Gerar relatório de progresso");
+            System.out.println("5. Alterar estado da tarefa");
+            System.out.println("6. Sair");
+
+            System.out.print("Escolha uma opção: ");
+            int opcao = scanner.nextInt();
+            scanner.nextLine(); // Consume newline left-over
+
+            switch (opcao) {
+                case 1:
+                    criarNovoProjeto(empresa, scanner);
+                    break;
+                case 2:
+                    alocarFuncionarioAProjeto(empresa, scanner);
+                    break;
+                case 3:
+                    adicionarTarefaAProjeto(empresa, scanner);
+                    break;
+                case 4:
+                    empresa.gerarRelatorioDeProgresso();
+                    break;
+                case 5:
+                    alterarEstadoTarefa(empresa, scanner);
+                    break;
+                case 6:
+                    System.out.println("Saindo...");
+                    return;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+    }
+
+    private static void criarNovoProjeto(Empresa empresa, Scanner scanner) {
+        System.out.print("Digite o nome do projeto: ");
+        String nomeProjeto = scanner.nextLine();
+        empresa.criarNovoProjeto(nomeProjeto, new Date());
+        System.out.println("Projeto criado com sucesso!");
+    }
+
+    private static void alocarFuncionarioAProjeto(Empresa empresa, Scanner scanner) {
+        System.out.print("Digite o nome do projeto: ");
+        String nomeProjeto = scanner.nextLine();
+        System.out.print("Digite o nome do funcionário: ");
+        String nomeFuncionario = scanner.nextLine();
+        System.out.print("Digite o cargo do funcionário: ");
+        String cargoFuncionario = scanner.nextLine();
+        empresa.alocarFuncionarioAProjeto(nomeProjeto, new Funcionario(nomeFuncionario, cargoFuncionario));
+        System.out.println("Funcionário alocado com sucesso!");
+    }
+
+    private static void adicionarTarefaAProjeto(Empresa empresa, Scanner scanner) {
+        System.out.print("Digite o nome do projeto: ");
+        String nomeProjeto = scanner.nextLine();
+        System.out.print("Digite o nome da tarefa: ");
+        String nomeTarefa = scanner.nextLine();
+        System.out.print("Digite a descrição da tarefa: ");
+        String descricaoTarefa = scanner.nextLine();
+        System.out.print("Digite a duração estimada da tarefa: ");
+        int duracaoTarefa = scanner.nextInt();
+        System.out.print("Digite o Estado da Tarefa(Novo,Andamento,Concluido): ");
+        String estado = scanner.nextLine();
+        scanner.nextLine();
+        empresa.adicionarTarefaAProjeto(nomeProjeto, new Tarefa(nomeTarefa, descricaoTarefa, duracaoTarefa, estado));
+        System.out.println("Tarefa adicionada com sucesso!");
+    }
+
+    private static void alterarEstadoTarefa(Empresa empresa, Scanner scanner) {
+        System.out.print("Digite o nome do projeto: ");
+        String nomeProjeto = scanner.nextLine();
+        System.out.print("Digite o nome da tarefa: ");
+        String nomeTarefa = scanner.nextLine();
+        System.out.print("Digite o novo estado da tarefa (Novo,Em Andamento,Concluido): ");
+        String novoEstado = scanner.nextLine();
+        empresa.alterarEstadoTarefa(nomeProjeto, nomeTarefa, novoEstado);
+        System.out.println("Estado da tarefa alterado com sucesso!");
+    }
+}
+
+Exercício 4:
+Código com IA:
+
+public class Quarto {
+    private int numero;
+    private String tipo; // simples, duplo, suíte
+    private boolean disponivel;
+
+    public Quarto(int numero, String tipo) {
+        this.numero = numero;
+        this.tipo = tipo;
+        this.disponivel = true; // Quarto começa disponível
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
+    }
+
+    @Override
+    public String toString() {
+        return "Quarto{" +
+                "numero=" + numero +
+                ", tipo='" + tipo + '\'' +
+                ", disponivel=" + disponivel +
+                '}';
+    }
+}
+
+public class Cliente {
+    private String nome;
+    private String documento;
+    private String contato;
+
+    public Cliente(String nome, String documento, String contato) {
+        this.nome = nome;
+        this.documento = documento;
+        this.contato = contato;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public String getContato() {
+        return contato;
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "nome='" + nome + '\'' +
+                ", documento='" + documento + '\'' +
+                ", contato='" + contato + '\'' +
+                '}';
+    }
+}
+
+import java.time.LocalDate;
+
+public class Reserva {
+    private Quarto quarto;
+    private Cliente cliente;
+    private LocalDate dataCheckIn;
+    private LocalDate dataCheckOut;
+
+    public Reserva(Quarto quarto, Cliente cliente, LocalDate dataCheckIn, LocalDate dataCheckOut) {
+        this.quarto = quarto;
+        this.cliente = cliente;
+        this.dataCheckIn = dataCheckIn;
+        this.dataCheckOut = dataCheckOut;
+    }
+
+    public Quarto getQuarto() {
+        return quarto;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public LocalDate getDataCheckIn() {
+        return dataCheckIn;
+    }
+
+    public LocalDate getDataCheckOut() {
+        return dataCheckOut;
+    }
+
+    @Override
+    public String toString() {
+        return "Reserva{" +
+                "quarto=" + quarto +
+                ", cliente=" + cliente +
+                ", dataCheckIn=" + dataCheckIn +
+                ", dataCheckOut=" + dataCheckOut +
+                '}';
+    }
+}
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Hotel {
+    private List<Quarto> quartos;
+    private List<Reserva> reservas;
+
+    public Hotel() {
+        this.quartos = new ArrayList<>();
+        this.reservas = new ArrayList<>();
+    }
+
+    // Adiciona um novo quarto ao hotel
+    public void adicionarQuarto(Quarto quarto) {
+        quartos.add(quarto);
+        System.out.println("Quarto adicionado: " + quarto);
+    }
+
+    // Faz uma nova reserva
+    public void reservarQuarto(Cliente cliente, String tipoQuarto, LocalDate dataCheckIn, LocalDate dataCheckOut) {
+        for (Quarto quarto : quartos) {
+            if (quarto.getTipo().equalsIgnoreCase(tipoQuarto) && quarto.isDisponivel()) {
+                Reserva reserva = new Reserva(quarto, cliente, dataCheckIn, dataCheckOut);
+                reservas.add(reserva);
+                quarto.setDisponivel(false); // Marca o quarto como indisponível
+                System.out.println("Reserva feita: " + reserva);
+                return;
+            }
+        }
+        System.out.println("Nenhum quarto disponível do tipo " + tipoQuarto);
+    }
+
+    // Lista quartos disponíveis por tipo
+    public void listarQuartosDisponiveisPorTipo(String tipo) {
+        System.out.println("Quartos disponíveis do tipo " + tipo + ":");
+        for (Quarto quarto : quartos) {
+            if (quarto.getTipo().equalsIgnoreCase(tipo) && quarto.isDisponivel()) {
+                System.out.println(quarto);
+            }
+        }
+    }
+
+    // Cancela uma reserva
+    public void cancelarReserva(Cliente cliente) {
+        for (Reserva reserva : reservas) {
+            if (reserva.getCliente().equals(cliente)) {
+                reserva.getQuarto().setDisponivel(true); // Marca o quarto como disponível
+                reservas.remove(reserva);
+                System.out.println("Reserva cancelada: " + reserva);
+                return;
+            }
+        }
+        System.out.println("Reserva não encontrada para o cliente: " + cliente.getNome());
+    }
+
+    // Gera um relatório de reservas futuras
+    public void gerarRelatorioReservasFuturas() {
+        System.out.println("Relatório de reservas futuras:");
+        for (Reserva reserva : reservas) {
+            if (reserva.getDataCheckIn().isAfter(LocalDate.now())) {
+                System.out.println(reserva);
+            }
+        }
+    }
+}
+
+import java.time.LocalDate;
+
+public class Main {
+    public static void main(String[] args) {
+        // Criando o hotel
+        Hotel hotel = new Hotel();
+
+        // Adicionando quartos ao hotel
+        Quarto quarto1 = new Quarto(101, "simples");
+        Quarto quarto2 = new Quarto(102, "duplo");
+        Quarto quarto3 = new Quarto(103, "suíte");
+        hotel.adicionarQuarto(quarto1);
+        hotel.adicionarQuarto(quarto2);
+        hotel.adicionarQuarto(quarto3);
+
+        // Criando clientes
+        Cliente cliente1 = new Cliente("Carlos Silva", "123456789", "carlos@exemplo.com");
+        Cliente cliente2 = new Cliente("Maria Oliveira", "987654321", "maria@exemplo.com");
+
+        // Reservando quartos
+        hotel.reservarQuarto(cliente1, "simples", LocalDate.of(2024, 9, 25), LocalDate.of(2024, 9, 30));
+        hotel.reservarQuarto(cliente2, "duplo", LocalDate.of(2024, 9, 28), LocalDate.of(2024, 10, 5));
+
+        // Listando quartos disponíveis do tipo "suíte"
+        hotel.listarQuartosDisponiveisPorTipo("suíte");
+
+        // Cancelando uma reserva
+        hotel.cancelarReserva(cliente1);
+
+        // Gerando relatório de reservas futuras
+        hotel.gerarRelatorioReservasFuturas();
+    }
+}
+
+Código sem Ia:
+
+public class Quarto {
+    private int numero;
+    private String tipo;
+    private boolean disponibilidade;
+
+    public Quarto(int numero, String tipo) {
+        this.numero = numero;
+        this.tipo = tipo;
+        this.disponibilidade = true;
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public boolean isDisponibilidade() {
+        return disponibilidade;
+    }
+
+    public void setDisponibilidade(boolean disponibilidade) {
+        this.disponibilidade = disponibilidade;
+    }
+}
+
+public class Cliente {
+    private String nome;
+    private String documento;
+    private String contato;
+
+    public Cliente(String nome, String documento, String contato) {
+        this.nome = nome;
+        this.documento = documento;
+        this.contato = contato;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public String getContato() {
+        return contato;
+    }
+}
+
+import java.util.Date;
+
+public class Reserva {
+    private Quarto quarto;
+    private Cliente cliente;
+    private Date dataCheckIn;
+    private Date dataCheckOut;
+
+    public Reserva(Quarto quarto, Cliente cliente, Date dataCheckIn, Date dataCheckOut) {
+        this.quarto = quarto;
+        this.cliente = cliente;
+        this.dataCheckIn = dataCheckIn;
+        this.dataCheckOut = dataCheckOut;
+        quarto.setDisponibilidade(false);
+    }
+
+    public Quarto getQuarto() {
+        return quarto;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public Date getDataCheckIn() {
+        return dataCheckIn;
+    }
+
+    public Date getDataCheckOut() {
+        return dataCheckOut;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Hotel {
+    private List<Quarto> quartos;
+    private List<Reserva> reservas;
+
+    public Hotel() {
+        this.quartos = new ArrayList<>();
+        this.reservas = new ArrayList<>();
+    }
+
+    public void addQuarto(Quarto quarto) {
+        quartos.add(quarto);
+    }
+
+    public void reservarQuarto(Quarto quarto, Cliente cliente, Date dataCheckIn, Date dataCheckOut) {
+        Reserva reserva = new Reserva(quarto, cliente, dataCheckIn, dataCheckOut);
+        reservas.add(reserva);
+    }
+
+    public List<Quarto> getQuartosDisponiveisPorTipo(String tipo) {
+        List<Quarto> quartosDisponiveis = new ArrayList<>();
+        for (Quarto quarto : quartos) {
+            if (quarto.getTipo().equals(tipo) && quarto.isDisponibilidade()) {
+                quartosDisponiveis.add(quarto);
+            }
+        }
+        return quartosDisponiveis;
+    }
+
+    public void cancelarReserva(Reserva reserva) {
+        reservas.remove(reserva);
+        reserva.getQuarto().setDisponibilidade(true);
+    }
+
+    public List<Reserva> getReservasFuturas() {
+        List<Reserva> reservasFuturas = new ArrayList<>();
+        for (Reserva reserva : reservas) {
+            if (reserva.getDataCheckIn().after(new Date())) {
+                reservasFuturas.add(reserva);
+            }
+        }
+        return reservasFuturas;
+    }
+}
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
+
+public class Manage {
+    public static void main(String[] args) throws ParseException {
+        Hotel hotel = new Hotel();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Adicionar quarto");
+            System.out.println("2. Reservar quarto");
+            System.out.println("3. Listar quartos disponíveis por tipo");
+            System.out.println("4. Cancelar reserva");
+            System.out.println("5. Listar reservas futuras");
+            System.out.println("6. Sair");
+
+            System.out.print("Escolha uma opção: ");
+            int opcao = scanner.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    System.out.print("Número do quarto: ");
+                    int numero = scanner.nextInt();
+                    System.out.print("Tipo do quarto (simples, duplo, suíte): ");
+                    String tipo = scanner.next();
+                    hotel.addQuarto(new Quarto(numero, tipo));
+                    System.out.println("Quarto adicionado com sucesso!");
+                    break;
+                case 2:
+                    System.out.print("Tipo do quarto (simples, duplo, suíte): ");
+                    String tipoReserva = scanner.next();
+                    List<Quarto> quartosDisponiveis = hotel.getQuartosDisponiveisPorTipo(tipoReserva);
+                    if (quartosDisponiveis.isEmpty()) {
+                        System.out.println("Não há quartos disponíveis desse tipo.");
+                    } else {
+                        System.out.println("Quartos disponíveis:");
+                        for (Quarto quarto : quartosDisponiveis) {
+                            System.out.println(quarto.getNumero());
+                        }
+                        System.out.print("Escolha um quarto: ");
+                        int numeroQuarto = scanner.nextInt();
+                        scanner.nextLine();
+                        Quarto quartoSelecionado = null;
+                        for (Quarto quarto : quartosDisponiveis) {
+                            if (quarto.getNumero() == numeroQuarto) {
+                                quartoSelecionado = quarto;
+                                break;
+                            }
+                        }
+                        if (quartoSelecionado != null) {
+                            System.out.print("Nome do cliente: ");
+                            String nomeCliente = scanner.nextLine();
+                            System.out.print("Documento do cliente: ");
+                            String documentoCliente = scanner.nextLine();
+                            System.out.print("Contato do cliente: ");
+                            String contatoCliente = scanner.nextLine();
+                            Cliente cliente = new Cliente(nomeCliente, documentoCliente, contatoCliente);
+                            System.out.print("Data de check-in (yyyy-mm-dd): ");
+                            String dataCheckIn = scanner.nextLine();
+                            System.out.print("Data de check-out (yyyy-mm-dd): ");
+                            String dataCheckOut = scanner.nextLine();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            Date dataCheckInDate = sdf.parse(dataCheckIn);
+                            Date dataCheckOutDate = sdf.parse(dataCheckOut);
+                            hotel.reservarQuarto(quartoSelecionado, cliente, dataCheckInDate, dataCheckOutDate);
+                            System.out.println("Reserva realizada com sucesso!");
+                        } else {
+                            System.out.println("Quarto não encontrado.");
+                        }
+                    }
+                    break;
+                case 3:
+                    System.out.print("Tipo do quarto (simples, duplo, suíte): ");
+                    String tipoListar = scanner.next();
+                    List<Quarto> quartosDisponiveisListar = hotel.getQuartosDisponiveisPorTipo(tipoListar);
+                    System.out.println("Quartos disponíveis:");
+                    for (Quarto quarto : quartosDisponiveisListar) {
+                        System.out.println(quarto.getNumero());
+                    }
+                    break;
+                case 4:
+                    System.out.print("Número da reserva: ");
+                    int numeroReserva = scanner.nextInt();
+                    Reserva reservaCancelar = null;
+                    for (Reserva reserva : hotel.getReservasFuturas()) {
+                        if (reserva.getQuarto().getNumero() == numeroReserva) {
+                            reservaCancelar = reserva;
+                            break;
+                        }
+                    }
+                    if (reservaCancelar != null) {
+                        hotel.cancelarReserva(reservaCancelar);
+                        System.out.println("Reserva cancelada com sucesso!");
+                    } else {
+                        System.out.println("Reserva não encontrada.");
+                    }
+                    break;
+                case 5:
+                    List<Reserva> reservasFuturas = hotel.getReservasFuturas();
+                    System.out.println("Reservas futuras:");
+                    for (Reserva reserva : reservasFuturas) {
+                        System.out.println("Quarto " + reserva.getQuarto().getNumero() + " - Cliente "
+                                + reserva.getCliente().getNome());
+                    }
+                    break;
+                case 6:
+                    System.out.println("Saindo...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+    }
+}
+
+Exercício 5:
+Código com IA:
+
+public class Produto {
+    private String nome;
+    private double preco;
+    private int estoque;
+
+    public Produto(String nome, double preco, int estoque) {
+        this.nome = nome;
+        this.preco = preco;
+        this.estoque = estoque;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public int getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(int estoque) {
+        this.estoque = estoque;
+    }
+
+    @Override
+    public String toString() {
+        return "Produto{" +
+                "nome='" + nome + '\'' +
+                ", preco=" + preco +
+                ", estoque=" + estoque +
+                '}';
+    }
+}
+
+public class Cliente {
+    private String nome;
+    private String endereco;
+    private String email;
+
+    public Cliente(String nome, String endereco, String email) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.email = email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "nome='" + nome + '\'' +
+                ", endereco='" + endereco + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CarrinhoDeCompras {
+    private Cliente cliente;
+    private List<Produto> produtos;
+
+    public CarrinhoDeCompras(Cliente cliente) {
+        this.cliente = cliente;
+        this.produtos = new ArrayList<>();
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public List<Produto> getProdutos() {
+        return produtos;
+    }
+
+    // Adiciona um produto ao carrinho
+    public void adicionarProduto(Produto produto) {
+        if (produto.getEstoque() > 0) {
+            produtos.add(produto);
+            produto.setEstoque(produto.getEstoque() - 1); // Reduz o estoque ao adicionar
+            System.out.println("Produto adicionado: " + produto.getNome());
+        } else {
+            System.out.println("Produto indisponível: " + produto.getNome());
+        }
+    }
+
+    // Remove um produto do carrinho
+    public void removerProduto(Produto produto) {
+        if (produtos.remove(produto)) {
+            produto.setEstoque(produto.getEstoque() + 1); // Aumenta o estoque ao remover
+            System.out.println("Produto removido: " + produto.getNome());
+        } else {
+            System.out.println("Produto não encontrado no carrinho.");
+        }
+    }
+
+    // Calcula o valor total do carrinho
+    public double calcularTotal() {
+        double total = 0;
+        for (Produto produto : produtos) {
+            total += produto.getPreco();
+        }
+        return total;
+    }
+
+    @Override
+    public String toString() {
+        return "CarrinhoDeCompras{" +
+                "cliente=" + cliente +
+                ", produtos=" + produtos +
+                '}';
+    }
+}
+
+import java.time.LocalDate;
+
+public class Pedido {
+    private CarrinhoDeCompras carrinho;
+    private LocalDate data;
+    private String status; // processando, enviado, entregue
+
+    public Pedido(CarrinhoDeCompras carrinho) {
+        this.carrinho = carrinho;
+        this.data = LocalDate.now();
+        this.status = "processando";
+    }
+
+    public CarrinhoDeCompras getCarrinho() {
+        return carrinho;
+    }
+
+    public LocalDate getData() {
+        return data;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Pedido{" +
+                "carrinho=" + carrinho +
+                ", data=" + data +
+                ", status='" + status + '\'' +
+                '}';
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class LojaVirtual {
+    private List<Produto> produtos;
+    private List<Pedido> pedidos;
+
+    public LojaVirtual() {
+        this.produtos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+    }
+
+    // Adiciona um produto à loja
+    public void adicionarProduto(Produto produto) {
+        produtos.add(produto);
+        System.out.println("Produto adicionado à loja: " + produto);
+    }
+
+    // Processa um novo pedido
+    public void processarPedido(Pedido pedido) {
+        pedidos.add(pedido);
+        pedido.setStatus("processando");
+        System.out.println("Pedido processado: " + pedido);
+    }
+
+    // Atualiza o status de um pedido
+    public void atualizarStatusPedido(Pedido pedido, String novoStatus) {
+        pedido.setStatus(novoStatus);
+        System.out.println("Status do pedido atualizado para: " + novoStatus);
+    }
+
+    // Gera um relatório de vendas (mostra todos os pedidos e seus status)
+    public void gerarRelatorioVendas() {
+        System.out.println("Relatório de Vendas:");
+        for (Pedido pedido : pedidos) {
+            System.out.println(pedido);
+        }
+    }
+
+    // Mostra o estoque atual dos produtos
+    public void mostrarEstoque() {
+        System.out.println("Estoque Atual:");
+        for (Produto produto : produtos) {
+            System.out.println(produto.getNome() + " - Estoque: " + produto.getEstoque());
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Criando a loja virtual
+        LojaVirtual loja = new LojaVirtual();
+
+        // Criando produtos
+        Produto p1 = new Produto("Laptop", 3500.0, 10);
+        Produto p2 = new Produto("Smartphone", 2000.0, 5);
+        Produto p3 = new Produto("Teclado", 150.0, 20);
+
+        // Adicionando produtos à loja
+        loja.adicionarProduto(p1);
+        loja.adicionarProduto(p2);
+        loja.adicionarProduto(p3);
+
+        // Criando um cliente
+        Cliente cliente1 = new Cliente("João Silva", "Rua das Flores, 123", "joao@exemplo.com");
+
+        // Criando um carrinho de compras para o cliente
+        CarrinhoDeCompras carrinho = new CarrinhoDeCompras(cliente1);
+
+        // Adicionando produtos ao carrinho
+        carrinho.adicionarProduto(p1);
+        carrinho.adicionarProduto(p2);
+        carrinho.adicionarProduto(p3);
+
+        // Removendo um produto do carrinho
+        carrinho.removerProduto(p3);
+
+        // Calculando o total do carrinho
+        double total = carrinho.calcularTotal();
+        System.out.println("Valor total do carrinho: R$" + total);
+
+        // Criando um pedido com o carrinho
+        Pedido pedido = new Pedido(carrinho);
+
+        // Processando o pedido
+        loja.processarPedido(pedido);
+
+        // Atualizando o status do pedido para "enviado"
+        loja.atualizarStatusPedido(pedido, "enviado");
+
+        // Mostrando o estoque após as vendas
+        loja.mostrarEstoque();
+
+        // Gerando relatório de vendas
+        loja.gerarRelatorioVendas();
+    }
+}
+
+Código sem Ia:
+
+public class Produto {
+    private String nome;
+    private double preco;
+    private int estoque;
+
+    public Produto(String nome, double preco, int estoque) {
+        this.nome = nome;
+        this.preco = preco;
+        this.estoque = estoque;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public int getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(int estoque) {
+        this.estoque = estoque;
+    }
+}
+
+public class Cliente {
+    private String nome;
+    private String endereco;
+    private String email;
+
+    public Cliente(String nome, String endereco, String email) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.email = email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CarrinhoDeCompras {
+    private List<Produto> produtos;
+    private Cliente cliente;
+
+    public CarrinhoDeCompras(Cliente cliente) {
+        this.produtos = new ArrayList<>();
+        this.cliente = cliente;
+    }
+
+    public void addProduto(Produto produto) {
+        produtos.add(produto);
+    }
+
+    public void removeProduto(Produto produto) {
+        produtos.remove(produto);
+    }
+
+    public List<Produto> getProdutos() {
+        return produtos;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public double calcularValorTotal() {
+        double total = 0;
+        for (Produto produto : produtos) {
+            total += produto.getPreco();
+        }
+        return total;
+    }
+}
+
+public class Pedido {
+    private CarrinhoDeCompras carrinho;
+    private String data;
+    private String status;
+
+    public Pedido(CarrinhoDeCompras carrinho, String data) {
+        this.carrinho = carrinho;
+        this.data = data;
+        this.status = "processando";
+    }
+
+    public CarrinhoDeCompras getCarrinho() {
+        return carrinho;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class LojaVirtual {
+    private List<Produto> produtos;
+    private List<Pedido> pedidos;
+
+    public LojaVirtual() {
+        this.produtos = new ArrayList<>();
+        this.pedidos = new ArrayList<>();
+    }
+
+    public void addProduto(Produto produto) {
+        produtos.add(produto);
+    }
+
+    public void processarPedido(Pedido pedido) {
+        pedidos.add(pedido);
+        for (Produto produto : pedido.getCarrinho().getProdutos()) {
+            produto.setEstoque(produto.getEstoque() - 1);
+        }
+    }
+
+    public void atualizarStatusPedido(Pedido pedido, String status) {
+        pedido.setStatus(status);
+    }
+
+    public double calcularValorTotalCarrinho(CarrinhoDeCompras carrinho) {
+        return carrinho.calcularValorTotal();
+    }
+
+    public void gerarRelatorioVendas() {
+        System.out.println("Relatório de Vendas:");
+        for (Pedido pedido : pedidos) {
+            System.out.println("Pedido de " + pedido.getCarrinho().getCliente().getNome() + " em " + pedido.getData());
+            System.out.println("Produtos:");
+            for (Produto produto : pedido.getCarrinho().getProdutos()) {
+                System.out.println(" - " + produto.getNome() + " - R$ " + produto.getPreco());
+            }
+            System.out.println("Valor Total: R$ " + calcularValorTotalCarrinho(pedido.getCarrinho()));
+            System.out.println("Status: " + pedido.getStatus());
+            System.out.println();
+        }
+    }
+}
+
+import java.util.Scanner;
+
+public class Manage {
+    public static void main(String[] args) {
+        LojaVirtual loja = new LojaVirtual();
+        Scanner scanner = new Scanner(System.in);
+        CarrinhoDeCompras carrinho = null;
+        Pedido pedido = null;
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Adicionar produto");
+            System.out.println("2. Criar carrinho de compras");
+            System.out.println("3. Processar pedido");
+            System.out.println("4. Atualizar status do pedido");
+            System.out.println("5. Gerar relatório de vendas");
+            System.out.println("6. Sair");
+
+            System.out.print("Escolha uma opção: ");
+            int opcao = scanner.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    System.out.print("Nome do produto: ");
+                    String nomeProduto = scanner.next();
+                    System.out.print("Preço do produto: ");
+                    double precoProduto = scanner.nextDouble();
+                    System.out.print("Estoque do produto: ");
+                    int estoqueProduto = scanner.nextInt();
+
+                    Produto produto = new Produto(nomeProduto, precoProduto, estoqueProduto);
+                    loja.addProduto(produto);
+                    System.out.println("Produto adicionado com sucesso!");
+                    break;
+
+                case 2:
+                    System.out.print("Nome do cliente: ");
+                    String nomeCliente = scanner.next();
+                    System.out.print("Endereço do cliente: ");
+                    String enderecoCliente = scanner.next();
+                    System.out.print("Email do cliente: ");
+                    String emailCliente = scanner.next();
+
+                    Cliente cliente = new Cliente(nomeCliente, enderecoCliente, emailCliente);
+                    carrinho = new CarrinhoDeCompras(cliente);
+
+                    System.out.println("Carrinho de compras criado com sucesso!");
+                    break;
+
+                case 3:
+                    if (carrinho == null) {
+                        System.out.println("Você precisa criar um carrinho de compras primeiro!");
+                        break;
+                    }
+
+                    System.out.print("Data do pedido: ");
+                    String dataPedido = scanner.next();
+
+                    pedido = new Pedido(carrinho, dataPedido);
+                    loja.processarPedido(pedido);
+                    System.out.println("Pedido processado com sucesso!");
+                    break;
+
+                case 4:
+                    if (pedido == null) {
+                        System.out.println("Você precisa processar um pedido primeiro!");
+                        break;
+                    }
+
+                    System.out.print("Status do pedido: ");
+                    String statusPedido = scanner.next();
+
+                    loja.atualizarStatusPedido(pedido, statusPedido);
+                    System.out.println("Status do pedido atualizado com sucesso!");
+                    break;
+
+                case 5:
+                    loja.gerarRelatorioVendas();
+                    break;
+
+                case 6:
+                    System.out.println("Saindo do sistema...");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+    }
+}
+
+Segundo a análise do código feito pela ia e feito por mim, percebi que eu e a ia importamos as mesmas bibliotecas de java para solucionar o código, 
+na maioria de algumas classes, fizemos os mesmos métodos, mas tendo construções diferentes neles, além da classe main onde eu fiz em formato de menu e
+a Ia não fez nesse formato. E em alguns métodos ele puxou o @Override para criar polimorfismo para definir como iria retornar algumas prints das classes.
+
+
+  
+
