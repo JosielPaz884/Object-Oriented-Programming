@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Viagem {
     private Motorista motorista;
     private CarroEletrico carro;
@@ -20,7 +23,7 @@ public class Viagem {
 
     private void planejarParadas() {
         double autonomiaRestante = carro.verificarAutonomia();
-        double distanciaRestante = calcularDistanciaRestante(destino);
+        double distanciaRestante = calcularDistanciaRestante(destino); 
         List<Eletroposto> eletropostosDisponiveis = new ArrayList<>();
 
         if (autonomiaRestante < distanciaRestante) {
@@ -32,14 +35,18 @@ public class Viagem {
                     }
                 }
             }
+
             while (distanciaNecessaria > 0 && !eletropostosDisponiveis.isEmpty()) {
                 Eletroposto eletropostoMaisProximo = encontrarEletropostoMaisProximo(eletropostosDisponiveis);
                 if (eletropostoMaisProximo != null) {
                     double autonomiaRecuperada = calcularEnergiaNecessaria(eletropostoMaisProximo);
                     carro.carregarBateria(autonomiaRecuperada);
                     distanciaNecessaria -= autonomiaRecuperada;
-                    eletropostoMaisProximo.setVagasDisponiveis(eletropostoMaisProximo.getVagasDisponiveis() - 1);
-                    registrarRecarga(new Recarga(carro, eletropostoMaisProximo, autonomiaRecuperada));
+                    eletropostoMaisProximo.setVagasDisponiveis(eletropostoMaisProximo.getVagasDisponiveis() - 1); 
+                    Recarga recarga = new Recarga(carro, eletropostoMaisProximo, autonomiaRecuperada);
+                    registrarRecarga(recarga);
+                    
+                    System.out.println("Recarga registrada: " + recarga.getQuantidadeRecarga() + " kWh no eletroposto " + eletropostoMaisProximo.getLocal());
                 } else {
                     System.out.println("Não há eletropostos disponíveis para recarga.");
                     break;
@@ -51,20 +58,30 @@ public class Viagem {
     }
 
     private double calcularDistanciaRestante(String destino) {
-        return 300;
+        switch (destino) {
+            case "CidadeA":
+                return 150; 
+            case "CidadeB":
+                return 300; 
+            case "CidadeC":
+                return 450; 
+            default:
+                return 300; 
+        }
     }
 
+
     private boolean verificarSeEletropostoNaRota(Eletroposto eletroposto) {
-        return true;
+        return true; 
     }
 
     private Eletroposto encontrarEletropostoMaisProximo(List<Eletroposto> eletropostos) {
-        return eletropostos.get(0);
+        return eletropostos.get(0); 
     }
 
     private double calcularEnergiaNecessaria(Eletroposto eletroposto) {
-        double energiaNecessaria = carro.getCapacidadeBateria() -
-                carro.getAutonomiaAtual();
-        return Math.min(energiaNecessaria, eletroposto.getTempoCarga() * 10);
+        double energiaNecessaria = carro.getCapacidadeBateria() - carro.getAutonomiaAtual();
+        double energiaPossivel = eletroposto.getTempoCarga() * 10; 
+        return Math.min(energiaNecessaria, energiaPossivel); 
     }
 }
